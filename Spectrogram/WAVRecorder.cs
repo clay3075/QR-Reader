@@ -1,5 +1,7 @@
-﻿using System.Diagnostics;
+﻿using System.CodeDom.Compiler;
+using System.Diagnostics;
 using System.IO;
+using System.Runtime.Remoting.Messaging;
 using NAudio.Wave;
 
 namespace Spectrogram
@@ -44,5 +46,17 @@ namespace Spectrogram
 
             return new FileInfo(outputPath);
         }
+
+        public static bool HasRecordingDevices()
+        {
+            return WaveIn.DeviceCount > 0;
+        }
+
+        public static bool HasOutputDevices()
+        {
+            return WaveOut.DeviceCount > 0;
+        }
     }
+
+    
 }
