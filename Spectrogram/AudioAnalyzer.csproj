@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{C2E1B77E-D48D-4965-AF94-C9944D3FD556}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>Spectrogram</RootNamespace>
-    <AssemblyName>Spectrogram</AssemblyName>
+    <RootNamespace>AudioAnalyzer</RootNamespace>
+    <AssemblyName>AudioAnalyzer</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

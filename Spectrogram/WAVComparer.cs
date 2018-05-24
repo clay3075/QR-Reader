@@ -1,10 +1,11 @@
-﻿using SoundFingerprinting;
+﻿using System.IO;
+using SoundFingerprinting;
 using SoundFingerprinting.Audio;
 using SoundFingerprinting.Builder;
 using SoundFingerprinting.DAO.Data;
 using SoundFingerprinting.InMemory;
 
-namespace Spectrogram
+namespace AudioAnalyzer
 {
     public static class WAVComparer
     {
@@ -13,6 +14,9 @@ namespace Spectrogram
 
         public static void StoreBaseWAVFile(string pathToWAV, int secondsToAnalyze)
         {
+            var fileName2 = Path.GetFileNameWithoutExtension(pathToWAV);
+            File.Copy(pathToWAV, fileName2 + "(2).wav", true);
+
             var track = new TrackData("123456789", "TechFriends", "TechFriends", "TechFriends", 2018, secondsToAnalyze);
 
             // store track metadata in the datasource

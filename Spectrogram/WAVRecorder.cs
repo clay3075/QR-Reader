@@ -2,9 +2,10 @@
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.Remoting.Messaging;
+using System.Threading.Tasks;
 using NAudio.Wave;
 
-namespace Spectrogram
+namespace AudioAnalyzer
 {
     public static class WAVRecorder
     {
@@ -43,8 +44,9 @@ namespace Spectrogram
                 //do nothing we are recording
             }
             CaptureInstance.StopRecording();
+            var info = new FileInfo(outputPath);
 
-            return new FileInfo(outputPath);
+            return info;
         }
 
         public static bool HasRecordingDevices()
@@ -56,7 +58,22 @@ namespace Spectrogram
         {
             return WaveOut.DeviceCount > 0;
         }
-    }
 
-    
+        public static void PlayAudioTrack(string path)
+        {
+            var task = Task.Factory.StartNew(() =>
+            {
+                var player = new WaveOutEvent();
+                var stream = new WaveFileReader(Path.GetFileNameWithoutExtension(path) + "(2).wav");
+
+                player.Init(new WaveChannel32(stream));
+                player.Play();
+                player.PlaybackStopped += (sender, args) =>
+                {
+                    player.Dispose();
+                    stream.Dispose();
+                };
+            });
+        }
+    }
 }

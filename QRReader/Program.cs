@@ -18,46 +18,54 @@ namespace QRReader
     {
         static void Main()
         {
-            var appSettings = new AppSettingsReader();
-
-            var barcodeReader = new BarcodeReader();
-            var outputPath = (string)appSettings.GetValue("PictureOutputPath", typeof(string));
-
-            var startTime = DateTime.Now;
-            var timeOut = (int)appSettings.GetValue("ScanTimeOut", typeof(int));
-            var cameraID = 0;
-
-            var capDevices = new FilterInfoCollection(FilterCategory.VideoInputDevice);
-            if (capDevices.Count == 0)
+            try
             {
-                Console.WriteLine("No camera is available.");
-                return;
+                var appSettings = new AppSettingsReader();
+
+                var barcodeReader = new BarcodeReader();
+                var outputPath = (string) appSettings.GetValue("PictureOutputPath", typeof(string));
+
+                var startTime = DateTime.Now;
+                var timeOut = (int) appSettings.GetValue("ScanTimeOut", typeof(int));
+                var cameraID = 0;
+
+                var capDevices = new FilterInfoCollection(FilterCategory.VideoInputDevice);
+                if (capDevices.Count == 0)
+                {
+                    Console.WriteLine("No camera is available.");
+                    return;
+                }
+
+                var capture = new VideoCaptureDevice(capDevices[0].MonikerString);
+
+                capture.NewFrame += (sender, args) =>
+                {
+                    var image = (Bitmap) args.Frame.Clone();
+                    var qrInfo = barcodeReader.Decode(image);
+                    if (!string.IsNullOrEmpty(qrInfo?.Text))
+                    {
+                        Console.WriteLine(qrInfo?.Text);
+                        image.Save(outputPath);
+                        capture.SignalToStop();
+                    }
+                    if (DateTime.Now >= startTime.AddMilliseconds(timeOut))
+                    {
+                        Console.WriteLine("Timeout reached with no QR code detected");
+                        image.Save(outputPath);
+                        capture.SignalToStop();
+                    }
+                };
+                Console.WriteLine("Starting video capture");
+                capture.Start();
+                capture.WaitForStop();
+
+                Console.Read();
             }
-
-            var capture = new VideoCaptureDevice(capDevices[0].MonikerString);
-
-            capture.NewFrame += (sender, args) =>
+            catch (Exception ex)
             {
-                var image = (Bitmap) args.Frame.Clone();
-                var qrInfo = barcodeReader.Decode(image);
-                if (!string.IsNullOrEmpty(qrInfo?.Text))
-                {
-                    Console.WriteLine(qrInfo?.Text);
-                    image.Save(outputPath);
-                    capture.SignalToStop();
-                }
-                if (DateTime.Now >= startTime.AddMilliseconds(timeOut))
-                {
-                    Console.WriteLine("Timeout reached with no QR code detected");
-                    image.Save(outputPath);
-                    capture.SignalToStop();
-                }
-            };
-            Console.WriteLine("Starting video capture");
-            capture.Start();
-            capture.WaitForStop();
-
-            Console.Read();
+                Console.WriteLine("Error occured when running camera test.");
+            }
+            
 
         }
 
