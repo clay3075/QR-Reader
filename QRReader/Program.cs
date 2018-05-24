@@ -2,59 +2,64 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
+using System.Drawing;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Net.Mail;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Emgu.CV;
-using Emgu.CV.UI;
+using AForge.Video.DirectShow;
 using ZXing;
 
 namespace QRReader
 {
     class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
             var appSettings = new AppSettingsReader();
-         
+
             var barcodeReader = new BarcodeReader();
             var outputPath = (string)appSettings.GetValue("PictureOutputPath", typeof(string));
 
             var startTime = DateTime.Now;
             var timeOut = (int)appSettings.GetValue("ScanTimeOut", typeof(int));
-            var reading = true;
+            var cameraID = 0;
 
-            var capture = new VideoCapture(0);
-
-            Console.WriteLine("Starting Video Capture");
-
-            while (reading)
+            var capDevices = new FilterInfoCollection(FilterCategory.VideoInputDevice);
+            if (capDevices.Count == 0)
             {
-                try
-                {
-                    var image = capture.QueryFrame();
-                    var qrInfo = barcodeReader.Decode(image.Bitmap);
-                    if (!string.IsNullOrEmpty(qrInfo?.Text))
-                    {
-                        reading = false;
-                        Console.WriteLine(qrInfo?.Text);
-                        image.Save(outputPath);
-                    }
-                    if (DateTime.Now >= startTime.AddMilliseconds(timeOut))
-                    {
-                        reading = false;
-                        Console.WriteLine("Timeout reached with no QR code detected");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
+                Console.WriteLine("No camera is available.");
+                return;
             }
 
+            var capture = new VideoCaptureDevice(capDevices[0].MonikerString);
+
+            capture.NewFrame += (sender, args) =>
+            {
+                var image = (Bitmap) args.Frame.Clone();
+                var qrInfo = barcodeReader.Decode(image);
+                if (!string.IsNullOrEmpty(qrInfo?.Text))
+                {
+                    Console.WriteLine(qrInfo?.Text);
+                    image.Save(outputPath);
+                    capture.SignalToStop();
+                }
+                if (DateTime.Now >= startTime.AddMilliseconds(timeOut))
+                {
+                    Console.WriteLine("Timeout reached with no QR code detected");
+                    image.Save(outputPath);
+                    capture.SignalToStop();
+                }
+            };
+            Console.WriteLine("Starting video capture");
+            capture.Start();
+            capture.WaitForStop();
+
             Console.Read();
+
         }
+
     }
 }
