@@ -53,7 +53,6 @@ namespace AudioAnalyzer
             {
                 Console.WriteLine("Error occurred when running audio test. " + ex.Message);
             }
-            Console.Read();
         }
     }
 }

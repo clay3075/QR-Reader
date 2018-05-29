@@ -38,6 +38,15 @@ namespace QRReader
 
                 var capture = new VideoCaptureDevice(capDevices[0].MonikerString);
 
+                var max = capture.VideoCapabilities[0];
+                foreach (var res in capture.VideoCapabilities)
+                {
+                    if (res.FrameSize.Width > max.FrameSize.Width)
+                    {
+                        max = res;
+                    }
+                }
+                capture.VideoResolution = max;
                 capture.NewFrame += (sender, args) =>
                 {
                     var image = (Bitmap) args.Frame.Clone();
