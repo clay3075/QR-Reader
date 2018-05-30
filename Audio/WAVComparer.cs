@@ -34,18 +34,27 @@ namespace AudioAnalyzer
             modelService.InsertHashDataForTrack(hashedFingerprints, trackReference);
         }
 
-        public static double PercentMatch(string pathToWAV, int secondsToAnalyze)
+        public static double PercentMatch(string pathToWAV, int secondsToAnalyze, int tries = 3)
         {
-            int startAtSecond = 0; // start at the begining
+            if (tries == 0)
+                return 0;
+            try
+            {
+                int startAtSecond = 0; // start at the begining
 
-            // query the underlying database for similar audio sub-fingerprints
-            var queryResult = QueryCommandBuilder.Instance.BuildQueryCommand()
-                .From(pathToWAV, secondsToAnalyze, startAtSecond)
-                .UsingServices(modelService, audioService)
-                .Query()
-                .Result;
+                // query the underlying database for similar audio sub-fingerprints
+                var queryResult = QueryCommandBuilder.Instance.BuildQueryCommand()
+                    .From(pathToWAV, secondsToAnalyze, startAtSecond)
+                    .UsingServices(modelService, audioService)
+                    .Query()
+                    .Result;
 
-            return queryResult.ContainsMatches ? queryResult.BestMatch.Confidence : 0; // confidence in which this track is a match
+                return queryResult.ContainsMatches ? queryResult.BestMatch.Confidence : 0; // confidence in which this track is a match
+            }
+            catch
+            {
+                return PercentMatch(pathToWAV, secondsToAnalyze, tries - 1);
+            }
         }
     }
 }

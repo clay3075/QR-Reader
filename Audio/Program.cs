@@ -19,6 +19,7 @@ namespace AudioAnalyzer
 
                 var outputPath = (string) appSettings.GetValue("WAVOutputPath", typeof(string));
                 var inputPath = (string) appSettings.GetValue("WAVInputPath", typeof(string));
+                var inputLength = (int) appSettings.GetValue("WAVInputLength", typeof(int));
                 var sampleSize = (int) appSettings.GetValue("SampleSize", typeof(int));
                 var percentCutoff = (double) appSettings.GetValue("AudioPercentage", typeof(double));
 
@@ -34,12 +35,13 @@ namespace AudioAnalyzer
                 }
                 if (string.IsNullOrEmpty(message))
                 {
-                    WAVComparer.StoreBaseWAVFile(inputPath, 17);
+                    WAVComparer.StoreBaseWAVFile(inputPath, inputLength);
                     WAVRecorder.PlayAudioTrack(inputPath);
                     WAVRecorder.Record(sampleSize, outputPath);
+                    //System.Threading.Thread.Sleep(3);
                     if (WAVComparer.PercentMatch(outputPath, sampleSize / 1000) >= percentCutoff)
                     {
-                        message = $"Good mic quality. {WAVComparer.PercentMatch(outputPath, sampleSize / 1000)}";
+                        message = "Good mic quality.";
                     }
                     else
                     {

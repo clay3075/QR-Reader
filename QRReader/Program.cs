@@ -64,11 +64,11 @@ namespace QRReader
                         capture.SignalToStop();
                     }
                 };
-                Console.WriteLine("Starting video capture");
+                //Console.WriteLine("Starting video capture");
                 capture.Start();
                 capture.WaitForStop();
 
-                Console.Read();
+                //Console.Read();
             }
             catch (Exception ex)
             {
