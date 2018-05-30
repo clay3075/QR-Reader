@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.27428.2043
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QRReader", "QRReader\QRReader.csproj", "{27486848-D911-4559-8D62-220C3D25A6D3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AudioAnalyzer", "Spectrogram\AudioAnalyzer.csproj", "{C2E1B77E-D48D-4965-AF94-C9944D3FD556}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AudioAnalyzer", "Audio\AudioAnalyzer.csproj", "{C2E1B77E-D48D-4965-AF94-C9944D3FD556}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
