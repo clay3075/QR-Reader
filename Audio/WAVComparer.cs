@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using SoundFingerprinting;
 using SoundFingerprinting.Audio;
 using SoundFingerprinting.Builder;
@@ -40,7 +41,7 @@ namespace AudioAnalyzer
                 return 0;
             try
             {
-                int startAtSecond = 0; // start at the begining
+                const int startAtSecond = 0; // start at the beginning
 
                 // query the underlying database for similar audio sub-fingerprints
                 var queryResult = QueryCommandBuilder.Instance.BuildQueryCommand()
@@ -49,7 +50,10 @@ namespace AudioAnalyzer
                     .Query()
                     .Result;
 
-                return queryResult.ContainsMatches ? queryResult.BestMatch.Confidence : 0; // confidence in which this track is a match
+                if (!queryResult.ContainsMatches)
+                    throw new Exception("Try again.");
+
+                return queryResult.BestMatch.Confidence; // confidence in which this track is a match
             }
             catch
             {

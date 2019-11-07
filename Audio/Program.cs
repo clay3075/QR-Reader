@@ -22,6 +22,7 @@ namespace AudioAnalyzer
                 var inputLength = (int) appSettings.GetValue("WAVInputLength", typeof(int));
                 var sampleSize = (int) appSettings.GetValue("SampleSize", typeof(int));
                 var percentCutoff = (double) appSettings.GetValue("AudioPercentage", typeof(double));
+                var retries = (int) appSettings.GetValue("Retries", typeof(int));
 
                 var message = "";
 
@@ -38,15 +39,8 @@ namespace AudioAnalyzer
                     WAVComparer.StoreBaseWAVFile(inputPath, inputLength);
                     WAVRecorder.PlayAudioTrack(inputPath);
                     WAVRecorder.Record(sampleSize, outputPath);
-                    //System.Threading.Thread.Sleep(3);
-                    if (WAVComparer.PercentMatch(outputPath, sampleSize / 1000) >= percentCutoff)
-                    {
-                        message = "Good mic quality.";
-                    }
-                    else
-                    {
-                        message = $"Bad mic quality. {WAVComparer.PercentMatch(outputPath, sampleSize / 1000)}";
-                    }
+                    var percentMatch = WAVComparer.PercentMatch(outputPath, sampleSize / 1000, retries);
+                    message = percentMatch >= percentCutoff ? "Good mic quality." : $"Bad mic quality. {percentMatch}";
                 }
                 Console.WriteLine(message);
                 
@@ -55,6 +49,7 @@ namespace AudioAnalyzer
             {
                 Console.WriteLine("Error occurred when running audio test. " + ex.Message);
             }
+            
         }
     }
 }
